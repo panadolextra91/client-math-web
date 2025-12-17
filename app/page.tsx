@@ -1,10 +1,45 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/Common/Card';
+import { Input } from '@/components/Common/Input';
+import { Button } from '@/components/Common/Button';
+import { validatePlayerName, sanitizePlayerName } from '@/lib/utils';
+import type { GameMode, Difficulty } from '@/lib/types';
+import Link from 'next/link';
+
 export default function Home() {
+  const router = useRouter();
+  const [playerName, setPlayerName] = useState('');
+  const [mode, setMode] = useState<GameMode>('arithmetic');
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+  const [error, setError] = useState<string | undefined>();
+  const [isStarting, setIsStarting] = useState(false);
+
+  const handleStart = () => {
+    const validation = validatePlayerName(playerName);
+    
+    if (!validation.isValid) {
+      setError(validation.error);
+      return;
+    }
+
+    const sanitized = sanitizePlayerName(playerName);
+    setIsStarting(true);
+    
+    // Navigate to game page with query params
+    router.push(
+      `/game?player=${encodeURIComponent(sanitized)}&mode=${mode}&difficulty=${difficulty}`
+    );
+  };
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-beige-50">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 bg-beige-50">
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-5xl font-light text-beige-900 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-light text-beige-900 tracking-tight">
             Math Learning Game
           </h1>
           <p className="text-lg text-beige-700 font-light">
@@ -12,70 +47,114 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Design System Preview */}
-        <div className="bg-beige-100 rounded-lg p-8 space-y-6 border border-beige-200">
-          <h2 className="text-2xl font-light text-beige-900">Design System</h2>
-          
-          {/* Color Palette */}
-          <div className="space-y-4">
-            <h3 className="text-lg text-beige-800 font-medium">Colors</h3>
-            
-            {/* Beige Palette */}
+        {/* Game Setup Form */}
+        <Card variant="elevated" className="w-full">
+          <CardHeader>
+            <CardTitle>Start New Game</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Player Name Input */}
+            <Input
+              label="Player Name"
+              placeholder="Enter your name"
+              value={playerName}
+              onChange={(e) => {
+                setPlayerName(e.target.value);
+                setError(undefined);
+              }}
+              error={error}
+              helperText="Your name will appear on the leaderboard"
+              onKeyPress={(e) => e.key === 'Enter' && handleStart()}
+              autoFocus
+            />
+
+            {/* Game Mode Selection */}
             <div>
-              <p className="text-sm text-beige-700 mb-2">Beige Palette</p>
-              <div className="flex gap-2">
-                <div className="w-16 h-16 bg-beige-200 rounded border border-beige-300"></div>
-                <div className="w-16 h-16 bg-beige-300 rounded border border-beige-400"></div>
-                <div className="w-16 h-16 bg-beige-400 rounded border border-beige-500"></div>
-                <div className="w-16 h-16 bg-beige-500 rounded border border-beige-600"></div>
+              <label className="block text-sm font-medium text-beige-700 mb-2">
+                Game Mode
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setMode('arithmetic')}
+                  aria-pressed={mode === 'arithmetic'}
+                  className={`
+                    px-4 py-3 rounded-lg border-2 transition-all font-medium
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+                    ${
+                      mode === 'arithmetic'
+                        ? 'border-green-500 bg-green-50 text-green-700'
+                        : 'border-beige-300 bg-beige-50 text-beige-700 hover:border-beige-400 active:scale-95'
+                    }
+                  `}
+                >
+                  Arithmetic
+                </button>
+                <button
+                  onClick={() => setMode('equation')}
+                  aria-pressed={mode === 'equation'}
+                  className={`
+                    px-4 py-3 rounded-lg border-2 transition-all font-medium
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+                    ${
+                      mode === 'equation'
+                        ? 'border-green-500 bg-green-50 text-green-700'
+                        : 'border-beige-300 bg-beige-50 text-beige-700 hover:border-beige-400 active:scale-95'
+                    }
+                  `}
+                >
+                  Equation
+                </button>
               </div>
             </div>
 
-            {/* Green Palette */}
+            {/* Difficulty Selection */}
             <div>
-              <p className="text-sm text-beige-700 mb-2">Green Palette</p>
-              <div className="flex gap-2">
-                <div className="w-16 h-16 bg-green-200 rounded border border-green-300"></div>
-                <div className="w-16 h-16 bg-green-300 rounded border border-green-400"></div>
-                <div className="w-16 h-16 bg-green-500 rounded border border-green-600"></div>
-                <div className="w-16 h-16 bg-green-600 rounded border border-green-700"></div>
+              <label className="block text-sm font-medium text-beige-700 mb-2">
+                Difficulty
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['easy', 'medium', 'hard'] as Difficulty[]).map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setDifficulty(level)}
+                    aria-pressed={difficulty === level}
+                    className={`
+                      px-2 sm:px-4 py-3 rounded-lg border-2 transition-all font-medium capitalize
+                      focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+                      ${
+                        difficulty === level
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-beige-300 bg-beige-50 text-beige-700 hover:border-beige-400 active:scale-95'
+                      }
+                    `}
+                  >
+                    {level}
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
 
-          {/* Button Examples */}
-          <div className="space-y-4">
-            <h3 className="text-lg text-beige-800 font-medium">Buttons</h3>
-            <div className="flex gap-4 flex-wrap">
-              <button className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium">
-                Primary
-              </button>
-              <button className="px-6 py-2 bg-beige-200 text-beige-900 rounded-lg hover:bg-beige-300 transition-colors font-medium">
-                Secondary
-              </button>
-              <button className="px-6 py-2 border-2 border-green-500 text-green-600 rounded-lg hover:bg-green-50 transition-colors font-medium">
-                Outline
-              </button>
-            </div>
-          </div>
+            {/* Start Button */}
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleStart}
+              isLoading={isStarting}
+              disabled={!playerName.trim()}
+              className="w-full"
+            >
+              Start Game
+            </Button>
+          </CardContent>
+        </Card>
 
-          {/* Typography */}
-          <div className="space-y-4">
-            <h3 className="text-lg text-beige-800 font-medium">Typography</h3>
-            <div className="space-y-2">
-              <p className="text-3xl font-light text-beige-900">Light Heading</p>
-              <p className="text-xl text-beige-800">Regular Text</p>
-              <p className="text-base text-beige-700">Body Text</p>
-              <p className="text-sm text-beige-600">Small Text</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="text-center">
-          <p className="text-beige-600 text-sm">
-            Phase 1 Complete • Ready for development
-          </p>
+        {/* Quick Links */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/leaderboard">
+            <Button variant="outline" size="md" className="w-full sm:w-auto">
+              View Leaderboard
+            </Button>
+          </Link>
         </div>
       </div>
     </main>

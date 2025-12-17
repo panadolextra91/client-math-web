@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Common/Navbar";
 import { Footer } from "@/components/Common/Footer";
+import { SkipLink } from "@/components/Common/SkipLink";
 
 export const metadata: Metadata = {
   title: "Math Learning Game",
@@ -16,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased flex flex-col min-h-screen">
+        <SkipLink />
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1" tabIndex={-1}>
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
