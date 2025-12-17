@@ -221,12 +221,122 @@ export const analyticsApi = {
 
 // Metrics API (admin only)
 export const metricsApi = {
-  get: async (adminApiKey?: string) => {
-    const headers: HeadersInit = {};
-    if (adminApiKey) {
-      headers['X-Admin-API-Key'] = adminApiKey;
-    }
-    return apiRequest<any>('/metrics', { headers });
+  get: async (adminApiKey: string) => {
+    return apiRequest<{
+      // Real-time performance metrics (60-second window)
+      totalRequests: number;
+      totalErrors: number;
+      averageResponseTime: number;
+      minResponseTime: number;
+      maxResponseTime: number;
+      requestsPerSecond: number;
+      statusCodes: Record<number, number>;
+      endpoints: Record<string, {
+        count: number;
+        avgResponseTime: number;
+        errors: number;
+      }>;
+      responseTimePercentiles: {
+        p50: number;
+        p95: number;
+        p99: number;
+      };
+      uptime: number;
+      timestamp: number;
+      // Enhanced analytics (all-time and time-based)
+      analytics?: {
+        players: {
+          total: number;
+          today: number;
+          thisMonth: number;
+          activeToday: number;
+        };
+        sessions: {
+          total: number;
+          active: number;
+          completed: number;
+          today: number;
+          thisMonth: number;
+          avgDuration: number | null;
+        };
+        questions: {
+          total: number;
+          today: number;
+          thisMonth: number;
+          totalCorrect: number;
+          totalWrong: number;
+          overallAccuracy: number;
+          todayAccuracy: number;
+          thisMonthAccuracy: number;
+        };
+        topics: {
+          mostPlayed: {
+            mode: string | null;
+            difficulty: string | null;
+            count: number;
+          };
+          byMode: Array<{
+            mode: string;
+            count: number;
+            accuracy: number;
+            avgTimeMs: number | null;
+          }>;
+          byDifficulty: Array<{
+            difficulty: string;
+            count: number;
+            accuracy: number;
+            avgTimeMs: number | null;
+          }>;
+          byModeAndDifficulty: Array<{
+            mode: string;
+            difficulty: string;
+            count: number;
+            accuracy: number;
+          }>;
+        };
+        performance: {
+          avgResponseTime: number | null;
+          avgResponseTimeToday: number | null;
+          fastestAvgResponseTime: {
+            mode: string | null;
+            difficulty: string | null;
+            avgTimeMs: number | null;
+          };
+          highestAccuracy: {
+            mode: string | null;
+            difficulty: string | null;
+            accuracy: number;
+          };
+        };
+        activity: {
+          peakHour: number | null;
+          questionsPerHour: Array<{
+            hour: number;
+            count: number;
+          }>;
+        };
+        scores: {
+          totalScore: number;
+          avgScorePerSession: number | null;
+          highestScore: number;
+          avgScorePerQuestion: number | null;
+        };
+        timestamp: string;
+      };
+    }>('/metrics', {
+      headers: {
+        'X-Admin-API-Key': adminApiKey,
+      },
+    });
+  },
+
+  reset: async (adminApiKey: string) => {
+    return apiRequest<{ message: string }>('/metrics/reset', {
+      method: 'POST',
+      headers: {
+        'X-Admin-API-Key': adminApiKey,
+      },
+    });
   },
 };
 
