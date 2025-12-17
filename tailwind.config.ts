@@ -9,41 +9,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Neutral beige palette
+        // Neo-brutalism palette (max 4 colors)
         beige: {
-          50: "#faf9f7",
-          100: "#f5f3f0",
-          200: "#ebe7e0",
-          300: "#ddd6cc",
-          400: "#c9bfb0",
-          500: "#b5a894",
-          600: "#9d8f78",
-          700: "#827562",
-          800: "#6b5f50",
-          900: "#574d42",
+          50: "#f9f4e6",  // background
+          100: "#f1e6cc", // card
+          200: "#e2d3a7", // border
+          300: "#e2d3a7", // alias to stay within 4 colors
+          400: "#f1e6cc", // alias to stay within 4 colors
+          500: "#1b1b1b", // primary text / outlines
+          900: "#0c0c0c", // strong text
         },
-        // Refreshing green palette
         green: {
-          50: "#f0f9f4",
-          100: "#dcf2e3",
-          200: "#bce5cc",
-          300: "#8fd1a8",
-          400: "#5bb57d",
-          500: "#3a9b5f",
-          600: "#2b7d4c",
-          700: "#24643e",
-          800: "#205034",
-          900: "#1c422c",
+          50: "#e0f2ff",  // subtle accent bg
+          300: "#9ad7ff", // hover
+          500: "#4fb3ff", // primary accent
+          700: "#005fa3", // dark accent
+          900: "#003462", // deep accent
         },
-        // Accent colors
         accent: {
-          light: "#8fd1a8",
-          DEFAULT: "#5bb57d",
-          dark: "#3a9b5f",
+          light: "#ffb3c1", // soft pink accent
+          DEFAULT: "#ff7b9c", // pink accent
+          dark: "#d9436a", // deep pink
+        },
+        yellow: {
+          500: "#ffd447", // highlight
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-bbh)", "system-ui", "sans-serif"],
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
