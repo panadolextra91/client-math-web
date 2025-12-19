@@ -30,3 +30,4 @@ export function GameControls({ onEndGame, isLoading, className }: GameControlsPr
 }
 
 
+
